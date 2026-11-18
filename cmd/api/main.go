@@ -15,12 +15,18 @@ func main() {
 		log.Fatal(err)
 	}
 
-	pool, err := database.Connect(context.Background(), cfg.DatabaseURL)
+	ctx := context.Background()
+
+	pool, err := database.Connect(ctx, cfg.DatabaseURL)
 	if err != nil {
 		log.Fatal(err)
 	}
 
 	defer pool.Close()
+
+	if err := database.Migrate(ctx, pool); err != nil {
+		log.Fatal(err)
+	}
 
 	r, err := app.NewRouter(cfg, pool)
 	if err != nil {
