@@ -1,3 +1,4 @@
+// Package config reads settings from environment variables and checks them at startup.
 package config
 
 import (

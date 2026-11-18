@@ -1,3 +1,4 @@
+// Package migrations holds the SQL schema changes, embedded into the binary.
 package migrations
 
 import "embed"

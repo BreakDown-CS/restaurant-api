@@ -1,3 +1,4 @@
+// Package database opens the PostgreSQL pool and runs migrations.
 package database
 
 import (

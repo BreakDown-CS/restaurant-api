@@ -1,3 +1,4 @@
+// Package app wires the HTTP router: middleware, routes and handlers.
 package app
 
 import (
