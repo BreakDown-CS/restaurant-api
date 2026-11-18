@@ -3,7 +3,7 @@ package database
 import (
 	"context"
 	"fmt"
-	"log"
+	"log/slog"
 
 	"github.com/jackc/pgx/v5/pgxpool"
 	"github.com/jackc/pgx/v5/stdlib"
@@ -29,7 +29,7 @@ func Migrate(ctx context.Context, pool *pgxpool.Pool) error {
 	}
 
 	for _, r := range results {
-		log.Printf("migrated %s (%s)", r.Source.Path, r.Duration)
+		slog.Info("migrated", "file", r.Source.Path, "duration", r.Duration)
 	}
 
 	return nil
