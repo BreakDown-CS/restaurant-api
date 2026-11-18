@@ -1,0 +1,30 @@
+version: "2"
+
+linters:
+  enable:
+    - bodyclose   # forgot to close an HTTP response body
+    - errorlint   # compares errors in ways that break wrapped (%w) errors
+    - gosec       # security problems
+    - misspell    # common English typos in comments and strings
+    - revive      # naming and comment style
+    - unconvert   # pointless type conversions
+  exclusions:
+    presets:
+      - std-error-handling
+    rules:
+      - path: _test\.go
+        linters: [gosec, errorlint]
+      # Everything lives under internal/, so a doc comment on every exported
+      # name adds noise. Other revive rules (package comments, naming) stay on.
+      - linters: [revive]
+        text: "^exported: "
+
+formatters:
+  enable:
+    - gofmt
+    - goimports
+  settings:
+    goimports:
+      # Put our own packages in a separate import group after third-party ones.
+      local-prefixes:
+        - github.com/BreakDown-CS/restaurant-api

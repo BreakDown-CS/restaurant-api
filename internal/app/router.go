@@ -5,9 +5,10 @@ import (
 	"net/http"
 	"time"
 
-	"github.com/BreakDown-CS/restaurant-api/internal/config"
 	"github.com/gin-gonic/gin"
 	"github.com/jackc/pgx/v5/pgxpool"
+
+	"github.com/BreakDown-CS/restaurant-api/internal/config"
 )
 
 func NewRouter(cfg *config.Config, pool *pgxpool.Pool) (*gin.Engine, error) {
