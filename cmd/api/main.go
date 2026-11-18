@@ -1,10 +1,12 @@
 package main
 
 import (
+	"context"
 	"log"
 
 	"github.com/BreakDown-CS/restaurant-api/internal/app"
 	"github.com/BreakDown-CS/restaurant-api/internal/config"
+	"github.com/BreakDown-CS/restaurant-api/internal/database"
 )
 
 func main() {
@@ -13,7 +15,14 @@ func main() {
 		log.Fatal(err)
 	}
 
-	r, err := app.NewRouter(cfg)
+	pool, err := database.Connect(context.Background(), cfg.DatabaseURL)
+	if err != nil {
+		log.Fatal(err)
+	}
+
+	defer pool.Close()
+
+	r, err := app.NewRouter(cfg, pool)
 	if err != nil {
 		log.Fatal(err)
 	}
