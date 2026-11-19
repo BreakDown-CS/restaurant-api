@@ -11,6 +11,8 @@ import (
 	"syscall"
 	"time"
 
+	"github.com/shopspring/decimal"
+
 	"github.com/BreakDown-CS/restaurant-api/internal/app"
 	"github.com/BreakDown-CS/restaurant-api/internal/config"
 	"github.com/BreakDown-CS/restaurant-api/internal/database"
@@ -28,7 +30,9 @@ func run() error {
 	if err != nil {
 		return err
 	}
+
 	setupLogger(cfg)
+	decimal.MarshalJSONWithoutQuotes = true
 
 	ctx, stop := signal.NotifyContext(context.Background(), os.Interrupt, syscall.SIGTERM)
 	defer stop()

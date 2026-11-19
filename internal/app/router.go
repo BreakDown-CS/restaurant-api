@@ -10,6 +10,7 @@ import (
 	"github.com/jackc/pgx/v5/pgxpool"
 
 	"github.com/BreakDown-CS/restaurant-api/internal/config"
+	"github.com/BreakDown-CS/restaurant-api/internal/features/menus"
 )
 
 func NewRouter(cfg *config.Config, pool *pgxpool.Pool) (*gin.Engine, error) {
@@ -27,6 +28,9 @@ func NewRouter(cfg *config.Config, pool *pgxpool.Pool) (*gin.Engine, error) {
 
 	v1 := r.Group("/api/v1")
 	v1.GET("health", health(pool))
+
+	menuHandler := menus.NewHandler(menus.NewUsecase(menus.NewRepository(pool)))
+	menuHandler.RegisterRoutes(v1)
 
 	return r, nil
 }
