@@ -12,11 +12,18 @@ import (
 
 var maxPrice = decimal.RequireFromString("99999999.99")
 
-type Usecase struct {
-	repo *Repository
+type repository interface {
+	List(ctx context.Context) ([]Menu, error)
+	Create(ctx context.Context, in MenuInput) (Menu, error)
+	Update(ctx context.Context, id uuid.UUID, in MenuInput) (Menu, error)
+	Delete(ctx context.Context, id uuid.UUID) error
 }
 
-func NewUsecase(repo *Repository) *Usecase {
+type Usecase struct {
+	repo repository
+}
+
+func NewUsecase(repo repository) *Usecase {
 	return &Usecase{repo: repo}
 }
 
