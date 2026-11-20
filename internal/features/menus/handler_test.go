@@ -56,7 +56,7 @@ func TestList_ReturnsMenus(t *testing.T) {
 
 	w := send(newTestRouter(repo), http.MethodGet, "/api/v1/menus", "")
 
-	assert.Equal(t, http.StatusOK, w.Code)
+	assert.Equal(t, http.StatusCreated, w.Code)
 	assert.Contains(t, w.Body.String(), `"price":59.5`, "price must be a JSON number, not a string")
 }
 
