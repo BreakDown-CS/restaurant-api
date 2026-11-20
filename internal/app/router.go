@@ -6,6 +6,7 @@ import (
 	"net/http"
 	"time"
 
+	"github.com/gin-contrib/cors"
 	"github.com/gin-gonic/gin"
 	"github.com/jackc/pgx/v5/pgxpool"
 
@@ -22,6 +23,12 @@ func NewRouter(cfg *config.Config, pool *pgxpool.Pool) (*gin.Engine, error) {
 
 	r := gin.New()
 	r.Use(gin.Logger(), gin.Recovery())
+	r.Use(cors.New(cors.Config{
+		AllowOrigins: cfg.CORSOrigins,
+		AllowMethods: []string{http.MethodGet, http.MethodPost, http.MethodPut, http.MethodDelete},
+		AllowHeaders: []string{"Content-Type"},
+		MaxAge:       12 * time.Hour,
+	}))
 
 	if err := r.SetTrustedProxies(nil); err != nil {
 		return nil, err
