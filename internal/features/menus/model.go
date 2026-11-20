@@ -17,3 +17,10 @@ type Menu struct {
 	CreatedAt   time.Time       `json:"createdAt"`
 	UpdatedAt   time.Time       `json:"updatedAt"`
 }
+
+type MenuInput struct {
+	Name        string           `json:"name" binding:"required,max=100"`
+	Price       *decimal.Decimal `json:"price" binding:"required"`
+	Category    string           `json:"category" binding:"required,max=50"`
+	IsAvailable bool             `json:"isAvailable"`
+}
