@@ -13,12 +13,13 @@ import (
 )
 
 type fakeRepo struct {
-	saved []MenuInput
-	err   error
+	menus []Menu      // returned by List
+	saved []MenuInput // every input that reached Create or Update
+	err   error       // returned by List, Update and Delete when set
 }
 
 func (f *fakeRepo) List(_ context.Context) ([]Menu, error) {
-	return nil, nil
+	return f.menus, f.err
 }
 
 func (f *fakeRepo) Create(_ context.Context, in MenuInput) (Menu, error) {
