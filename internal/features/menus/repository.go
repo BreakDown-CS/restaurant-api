@@ -2,7 +2,9 @@ package menus
 
 import (
 	"context"
+	"errors"
 
+	"github.com/google/uuid"
 	"github.com/jackc/pgx/v5"
 	"github.com/jackc/pgx/v5/pgxpool"
 )
@@ -42,4 +44,35 @@ func (r *Repository) Create(ctx context.Context, in MenuInput) (Menu, error) {
 	}
 
 	return pgx.CollectExactlyOneRow(rows, pgx.RowToStructByName[Menu])
+}
+
+func (r *Repository) Update(ctx context.Context, id uuid.UUID, in MenuInput) (Menu, error) {
+	rows, err := r.db.Query(ctx, `
+		UPDATE menus
+		SET name = $2, price = $3, category = $4, is_available = $5, updated_at = now()
+		WHERE id = $1
+		RETURNING `+menuColumns,
+		id, in.Name, in.Price, in.Category, in.IsAvailable,
+	)
+	if err != nil {
+		return Menu{}, err
+	}
+
+	menu, err := pgx.CollectExactlyOneRow(rows, pgx.RowToStructByName[Menu])
+	if errors.Is(err, pgx.ErrNoRows) {
+
+		return Menu{}, ErrNotFound
+	}
+	return menu, err
+}
+
+func (r *Repository) Delete(ctx context.Context, id uuid.UUID) error {
+	tag, err := r.db.Exec(ctx, `DELETE FROM menus WHERE id = $1`, id)
+	if err != nil {
+		return err
+	}
+	if tag.RowsAffected() == 0 {
+		return ErrNotFound
+	}
+	return nil
 }

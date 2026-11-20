@@ -2,11 +2,14 @@
 package menus
 
 import (
+	"errors"
 	"time"
 
 	"github.com/google/uuid"
 	decimal "github.com/shopspring/decimal"
 )
+
+var ErrNotFound = errors.New("menu not found")
 
 type Menu struct {
 	ID          uuid.UUID       `json:"id"`

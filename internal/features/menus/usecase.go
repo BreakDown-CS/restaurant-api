@@ -4,6 +4,7 @@ import (
 	"context"
 	"strings"
 
+	"github.com/google/uuid"
 	"github.com/shopspring/decimal"
 
 	"github.com/BreakDown-CS/restaurant-api/internal/validation"
@@ -24,14 +25,32 @@ func (u *Usecase) List(ctx context.Context) ([]Menu, error) {
 }
 
 func (u *Usecase) Create(ctx context.Context, in MenuInput) (Menu, error) {
-	in.Name = strings.TrimSpace(in.Name)
-	in.Category = strings.TrimSpace(in.Category)
+	in = cleanInput(in)
 
 	if err := validateInput(in); err != nil {
 		return Menu{}, err
 	}
 
 	return u.repo.Create(ctx, in)
+}
+
+func (u *Usecase) Update(ctx context.Context, id uuid.UUID, in MenuInput) (Menu, error) {
+	in = cleanInput(in)
+	if err := validateInput(in); err != nil {
+		return Menu{}, err
+	}
+
+	return u.repo.Update(ctx, id, in)
+}
+
+func (u *Usecase) Delete(ctx context.Context, id uuid.UUID) error {
+	return u.repo.Delete(ctx, id)
+}
+
+func cleanInput(in MenuInput) MenuInput {
+	in.Name = strings.TrimSpace(in.Name)
+	in.Category = strings.TrimSpace(in.Category)
+	return in
 }
 
 func validateInput(in MenuInput) error {
