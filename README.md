@@ -2,8 +2,7 @@
 
 ![CI](https://github.com/BreakDown-CS/restaurant-api/actions/workflows/ci.yml/badge.svg)
 
-Backend for a restaurant system that supports **buffet packages and à la carte** in the same bill.
-Rebuilt from my graduation project Rebuilt from my graduation project to learn how a production-style Go backend is designed, not just how to make it work (one sentence: why you are rebuilding it).
+Rebuilt from my graduation project to learn how a production-style Go backend is designed, not just how to make it work. (one sentence: why you are rebuilding it).
 
 Frontend: [restaurant-admin](https://github.com/BreakDown-CS/restaurant-admin)
 
@@ -70,4 +69,4 @@ Usecase rules are tested with a fake repository; HTTP handlers are tested end to
 
 - Why the usecase declares the repository interface itself: it lets tests use a fake instead of a real database.
 - Never send internal errors to the client: log the details, return a generic 500.
-- Rebuilt from my graduation project to learn how a production-style Go backend is designed, not just how to make it work.
+- CI does not block a push by itself; it needs pull requests and branch rules to protect main.
