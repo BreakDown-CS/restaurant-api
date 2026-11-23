@@ -2,7 +2,7 @@
 
 ![CI](https://github.com/BreakDown-CS/restaurant-api/actions/workflows/ci.yml/badge.svg)
 
-Rebuilt from my graduation project to learn how a production-style Go backend is designed, not just how to make it work. (one sentence: why you are rebuilding it).
+Rebuilt from my graduation project to learn how a production-style Go backend is designed, not just how to make it work.
 
 Frontend: [restaurant-admin](https://github.com/BreakDown-CS/restaurant-admin)
 
