@@ -2,6 +2,7 @@
 package categories
 
 import (
+	"errors"
 	"time"
 
 	"github.com/google/uuid"
@@ -12,4 +13,14 @@ type Category struct {
 	Name      string    `json:"name"`
 	CreatedAt time.Time `json:"createdAt"`
 	UpdatedAt time.Time `json:"updatedAt"`
+}
+
+var (
+	ErrNotFound  = errors.New("category not found")
+	ErrNameTaken = errors.New("category name already taken")
+	ErrInUse     = errors.New("category still has menus")
+)
+
+type CategoryInput struct {
+	Name string `json:"name"`
 }
