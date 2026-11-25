@@ -56,7 +56,6 @@ func (u *Usecase) Delete(ctx context.Context, id uuid.UUID) error {
 
 func cleanInput(in MenuInput) MenuInput {
 	in.Name = strings.TrimSpace(in.Name)
-	in.Category = strings.TrimSpace(in.Category)
 	return in
 }
 
@@ -67,8 +66,8 @@ func validateInput(in MenuInput) error {
 		fields["name"] = "required"
 	}
 
-	if in.Category == "" {
-		fields["category"] = "required"
+	if in.CategoryID == uuid.Nil {
+		fields["categoryId"] = "required"
 	}
 
 	switch {

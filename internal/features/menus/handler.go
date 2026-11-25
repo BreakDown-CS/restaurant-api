@@ -120,6 +120,12 @@ func (h *Handler) fail(c *gin.Context, op string, err error) {
 		return
 	}
 
+	if errors.Is(err, ErrCategoryNotFound) {
+		response.Fail(c, http.StatusBadRequest, "VALIDATION_FAILED", "Invalid input",
+			map[string]string{"categoryId": "does not exist"})
+		return
+	}
+
 	slog.Error(op, "err", err)
 	response.Fail(c, http.StatusInternalServerError, "INTERNAL_ERROR", "Something went wrong", nil)
 }

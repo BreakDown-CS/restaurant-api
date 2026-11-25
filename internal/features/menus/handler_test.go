@@ -64,7 +64,7 @@ func TestCreate_Returns201(t *testing.T) {
 	repo := &fakeRepo{}
 
 	w := send(newTestRouter(repo), http.MethodPost, "/api/v1/menus",
-		`{"name":"  Pad Kra Pao ","price":59.5,"category":"Rice","isAvailable":true}`)
+		`{"name":"  Pad Kra Pao ","price":59.5,"categoryId":"0190b9e0-0000-7000-8000-000000000001","isAvailable":true}`)
 
 	assert.Equal(t, http.StatusCreated, w.Code)
 	body := decode(t, w)
@@ -80,11 +80,12 @@ func TestCreate_Returns400(t *testing.T) {
 		wantCode string
 		wantKeys []string // fields expected in error.details
 	}{
-		{"empty object", `{}`, "VALIDATION_FAILED", []string{"name", "price", "category"}},
-		{"blank name (usecase rule)", `{"name":"   ","price":10,"category":"Rice"}`, "VALIDATION_FAILED", []string{"name"}},
-		{"3 decimals (usecase rule)", `{"name":"A","price":10.555,"category":"Rice"}`, "VALIDATION_FAILED", []string{"price"}},
+		{"empty object", `{}`, "VALIDATION_FAILED", []string{"name", "price", "categoryId"}},
+		{"blank name (usecase rule)", `{"name":"   ","price":10,"categoryId":"0190b9e0-0000-7000-8000-000000000001"}`, "VALIDATION_FAILED", []string{"name"}},
+		{"3 decimals (usecase rule)", `{"name":"A","price":10.555,"categoryId":"0190b9e0-0000-7000-8000-000000000001"}`, "VALIDATION_FAILED", []string{"price"}},
 		{"broken JSON", `{"name":`, "INVALID_JSON", nil},
-		{"price is text", `{"name":"A","price":"abc","category":"Rice"}`, "INVALID_JSON", nil},
+		{"price is text", `{"name":"A","price":"abc","categoryId":"0190b9e0-0000-7000-8000-000000000001"}`, "INVALID_JSON", nil},
+		{"categoryId is not a UUID", `{"name":"A","price":10,"categoryId":"rice"}`, "INVALID_JSON", nil},
 	}
 
 	for _, tt := range tests {
@@ -106,9 +107,21 @@ func TestCreate_Returns400(t *testing.T) {
 	}
 }
 
+func TestCreate_Returns400WhenCategoryDoesNotExist(t *testing.T) {
+	repo := &fakeRepo{err: ErrCategoryNotFound}
+
+	w := send(newTestRouter(repo), http.MethodPost, "/api/v1/menus",
+		`{"name":"A","price":10,"categoryId":"0190b9e0-0000-7000-8000-000000000099"}`)
+
+	assert.Equal(t, http.StatusBadRequest, w.Code)
+	body := decode(t, w)
+	assert.Equal(t, "VALIDATION_FAILED", body.Error.Code)
+	assert.Equal(t, "does not exist", body.Error.Details["categoryId"])
+}
+
 func TestUpdate_Returns200(t *testing.T) {
 	w := send(newTestRouter(&fakeRepo{}), http.MethodPut, "/api/v1/menus/"+uuid.NewString(),
-		`{"name":"A","price":1,"category":"Rice"}`)
+		`{"name":"A","price":1,"categoryId":"0190b9e0-0000-7000-8000-000000000001"}`)
 
 	assert.Equal(t, http.StatusOK, w.Code)
 }
@@ -128,8 +141,8 @@ func TestNotFound_Returns404(t *testing.T) {
 		body   string
 		repo   *fakeRepo
 	}{
-		{"update: id not a UUID", http.MethodPut, "/api/v1/menus/abc", `{"name":"A","price":1,"category":"R"}`, &fakeRepo{}},
-		{"update: no such menu", http.MethodPut, "/api/v1/menus/" + uuid.NewString(), `{"name":"A","price":1,"category":"R"}`, &fakeRepo{err: ErrNotFound}},
+		{"update: id not a UUID", http.MethodPut, "/api/v1/menus/abc", `{"name":"A","price":1,"categoryId":"0190b9e0-0000-7000-8000-000000000001"}`, &fakeRepo{}},
+		{"update: no such menu", http.MethodPut, "/api/v1/menus/" + uuid.NewString(), `{"name":"A","price":1,"categoryId":"0190b9e0-0000-7000-8000-000000000001"}`, &fakeRepo{err: ErrNotFound}},
 		{"delete: id not a UUID", http.MethodDelete, "/api/v1/menus/abc", "", &fakeRepo{}},
 		{"delete: no such menu", http.MethodDelete, "/api/v1/menus/" + uuid.NewString(), "", &fakeRepo{err: ErrNotFound}},
 	}
