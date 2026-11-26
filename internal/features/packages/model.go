@@ -12,6 +12,7 @@ import (
 type Package struct {
 	ID                   uuid.UUID       `json:"id"`
 	Name                 string          `json:"name"`
+	Level                int             `json:"level"`
 	PricePerPerson       decimal.Decimal `json:"pricePerPerson"`
 	TimeLimitMinutes     int             `json:"timeLimitMinutes"`
 	FreeBelowHeightCm    int             `json:"freeBelowHeightCm"`
@@ -32,6 +33,7 @@ var (
 
 type PackageInput struct {
 	Name                 string          `json:"name"`
+	Level                int             `json:"level"`
 	PricePerPerson       decimal.Decimal `json:"pricePerPerson"`
 	TimeLimitMinutes     int             `json:"timeLimitMinutes"`
 	FreeBelowHeightCm    int             `json:"freeBelowHeightCm"`

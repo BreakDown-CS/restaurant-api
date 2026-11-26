@@ -40,6 +40,7 @@ func TestList_ReadsAllColumns(t *testing.T) {
 	require.Equal(t, 90, got[0].TimeLimitMinutes)
 	require.Equal(t, 5, got[0].OvertimeGraceMinutes)
 	require.True(t, got[0].IsActive)
+	require.Equal(t, 1, got[0].Level)
 }
 
 func testPool(t *testing.T) *pgxpool.Pool {
@@ -57,6 +58,7 @@ func testPool(t *testing.T) *pgxpool.Pool {
 func sampleInput(name string) PackageInput {
 	return PackageInput{
 		Name:                 name,
+		Level:                1,
 		PricePerPerson:       decimal.RequireFromString("399.00"),
 		TimeLimitMinutes:     90,
 		FreeBelowHeightCm:    100,
@@ -87,11 +89,12 @@ func TestCreateGetUpdateDelete(t *testing.T) {
 
 	in := sampleInput("Test Premium Plus")
 	in.TimeLimitMinutes = 120
+	in.Level = 2
 	updated, err := repo.Update(ctx, created.ID, in)
 	require.NoError(t, err)
 	require.Equal(t, "Test Premium Plus", updated.Name)
 	require.Equal(t, 120, updated.TimeLimitMinutes)
-
+	require.Equal(t, 2, updated.Level)
 	require.NoError(t, repo.Delete(ctx, created.ID))
 	_, err = repo.GetByID(ctx, created.ID)
 	require.ErrorIs(t, err, ErrNotFound)
