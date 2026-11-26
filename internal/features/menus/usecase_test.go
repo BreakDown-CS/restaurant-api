@@ -78,6 +78,7 @@ func TestCreate_RejectsInvalidInput(t *testing.T) {
 		{"negative price", MenuInput{Name: "A", Price: price("-1"), CategoryID: anyCategory}, "price", "must be 0 or more"},
 		{"3 decimals", MenuInput{Name: "A", Price: price("10.555"), CategoryID: anyCategory}, "price", "must have at most 2 decimal places"},
 		{"too big", MenuInput{Name: "A", Price: price("100000000"), CategoryID: anyCategory}, "price", "must be at most 99999999.99"},
+		{"zero package level", MenuInput{Name: "A", Price: price("10"), CategoryID: anyCategory, MinPackageLevel: new(0)}, "minPackageLevel", "must be more than 0"},
 	}
 
 	for _, tt := range tests {
@@ -102,6 +103,18 @@ func TestCreate_AcceptsFreeItemAndTwoDecimals(t *testing.T) {
 		_, err := uc.Create(context.Background(), MenuInput{Name: "A", Price: price(p), CategoryID: uuid.New()})
 
 		assert.NoError(t, err, "price %s should be allowed", p)
+	}
+}
+
+func TestCreate_AcceptsMissingOrPositivePackageLevel(t *testing.T) {
+	for _, level := range []*int{nil, new(1), new(2)} {
+		repo := &fakeRepo{}
+
+		_, err := NewUsecase(repo).Create(context.Background(),
+			MenuInput{Name: "A", Price: price("10"), CategoryID: uuid.New(), MinPackageLevel: level})
+
+		require.NoError(t, err)
+		assert.Equal(t, level, repo.saved[0].MinPackageLevel, "the level must reach the repository unchanged")
 	}
 }
 

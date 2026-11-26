@@ -11,7 +11,7 @@ import (
 )
 
 // menuColumns reads the menu with its category name, joined from categories.
-const menuColumns = `m.id, m.name, m.price, m.category_id, c.name AS category, m.is_available, m.created_at, m.updated_at`
+const menuColumns = `m.id, m.name, m.price, m.category_id, c.name AS category, m.is_available, m.min_package_level, m.created_at, m.updated_at`
 
 const foreignKeyViolation = "23503"
 
@@ -44,14 +44,14 @@ func (r *Repository) List(ctx context.Context) ([]Menu, error) {
 func (r *Repository) Create(ctx context.Context, in MenuInput) (Menu, error) {
 	rows, err := r.db.Query(ctx, `
 		WITH written AS (
-			INSERT INTO menus (name, price, category_id, is_available)
-			VALUES ($1, $2, $3, $4)
+			INSERT INTO menus (name, price, category_id, is_available, min_package_level)
+			VALUES ($1, $2, $3, $4, $5)
 			RETURNING *
 		)
 		SELECT `+menuColumns+`
 		FROM written m
 		JOIN categories c ON c.id = m.category_id`,
-		in.Name, in.Price, in.CategoryID, in.IsAvailable,
+		in.Name, in.Price, in.CategoryID, in.IsAvailable, in.MinPackageLevel,
 	)
 	if err != nil {
 		return Menu{}, err
@@ -68,14 +68,14 @@ func (r *Repository) Update(ctx context.Context, id uuid.UUID, in MenuInput) (Me
 	rows, err := r.db.Query(ctx, `
 		WITH written AS (
 			UPDATE menus
-			SET name = $2, price = $3, category_id = $4, is_available = $5, updated_at = now()
+			SET name = $2, price = $3, category_id = $4, is_available = $5, min_package_level = $6, updated_at = now()
 			WHERE id = $1
 			RETURNING *
 		)
 		SELECT `+menuColumns+`
 		FROM written m
 		JOIN categories c ON c.id = m.category_id`,
-		id, in.Name, in.Price, in.CategoryID, in.IsAvailable,
+		id, in.Name, in.Price, in.CategoryID, in.IsAvailable, in.MinPackageLevel,
 	)
 	if err != nil {
 		return Menu{}, err

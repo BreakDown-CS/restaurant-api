@@ -15,19 +15,21 @@ var (
 )
 
 type Menu struct {
-	ID          uuid.UUID       `json:"id"`
-	Name        string          `json:"name"`
-	Price       decimal.Decimal `json:"price"`
-	CategoryID  uuid.UUID       `json:"categoryId"`
-	Category    string          `json:"category"`
-	IsAvailable bool            `json:"isAvailable"`
-	CreatedAt   time.Time       `json:"createdAt"`
-	UpdatedAt   time.Time       `json:"updatedAt"`
+	ID              uuid.UUID       `json:"id"`
+	Name            string          `json:"name"`
+	Price           decimal.Decimal `json:"price"`
+	CategoryID      uuid.UUID       `json:"categoryId"`
+	Category        string          `json:"category"`
+	IsAvailable     bool            `json:"isAvailable"`
+	MinPackageLevel *int            `json:"minPackageLevel"`
+	CreatedAt       time.Time       `json:"createdAt"`
+	UpdatedAt       time.Time       `json:"updatedAt"`
 }
 
 type MenuInput struct {
-	Name        string           `json:"name" binding:"required,max=100"`
-	Price       *decimal.Decimal `json:"price" binding:"required"`
-	CategoryID  uuid.UUID        `json:"categoryId" binding:"required"`
-	IsAvailable bool             `json:"isAvailable"`
+	Name            string           `json:"name" binding:"required,max=100"`
+	Price           *decimal.Decimal `json:"price" binding:"required"`
+	CategoryID      uuid.UUID        `json:"categoryId" binding:"required"`
+	IsAvailable     bool             `json:"isAvailable"`
+	MinPackageLevel *int             `json:"minPackageLevel"`
 }
