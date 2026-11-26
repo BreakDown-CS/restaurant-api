@@ -81,6 +81,10 @@ func validateInput(in MenuInput) error {
 		fields["price"] = "must be at most 99999999.99"
 	}
 
+	if in.MinPackageLevel != nil && *in.MinPackageLevel <= 0 {
+		fields["minPackageLevel"] = "must be more than 0"
+	}
+
 	if len(fields) > 0 {
 		return &validation.Error{Fields: fields}
 	}
