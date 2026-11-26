@@ -13,6 +13,7 @@ import (
 	"github.com/BreakDown-CS/restaurant-api/internal/config"
 	"github.com/BreakDown-CS/restaurant-api/internal/features/categories"
 	"github.com/BreakDown-CS/restaurant-api/internal/features/menus"
+	"github.com/BreakDown-CS/restaurant-api/internal/features/packages"
 	"github.com/BreakDown-CS/restaurant-api/internal/validation"
 )
 
@@ -43,6 +44,8 @@ func NewRouter(cfg *config.Config, pool *pgxpool.Pool) (*gin.Engine, error) {
 	menuHandler.RegisterRoutes(v1)
 	categoryHandler := categories.NewHandler(categories.NewUsecase(categories.NewRepository(pool)))
 	categoryHandler.RegisterRoutes(v1)
+	packageHandler := packages.NewHandler(packages.NewUsecase(packages.NewRepository(pool)))
+	packageHandler.RegisterRoutes(v1)
 
 	return r, nil
 }
