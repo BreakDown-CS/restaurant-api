@@ -32,7 +32,7 @@ var (
 )
 
 type PackageInput struct {
-	Name                 string          `json:"name"`
+	Name                 string          `json:"name" binding:"required,max=100"`
 	Level                int             `json:"level"`
 	PricePerPerson       decimal.Decimal `json:"pricePerPerson"`
 	TimeLimitMinutes     int             `json:"timeLimitMinutes"`
@@ -42,5 +42,5 @@ type PackageInput struct {
 	OvertimeGraceMinutes int             `json:"overtimeGraceMinutes"`
 	WasteFee             decimal.Decimal `json:"wasteFee"`
 	WasteUnitGrams       int             `json:"wasteUnitGrams"`
-	IsActive             bool            `json:"isActive"`
+	IsActive             *bool           `json:"isActive"`
 }

@@ -67,7 +67,7 @@ func sampleInput(name string) PackageInput {
 		OvertimeGraceMinutes: 5,
 		WasteFee:             decimal.RequireFromString("50"),
 		WasteUnitGrams:       100,
-		IsActive:             true,
+		IsActive:             new(true),
 	}
 }
 
