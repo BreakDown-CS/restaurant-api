@@ -26,6 +26,7 @@ func (h *Handler) RegisterRoutes(rg *gin.RouterGroup) {
 	rg.POST("/buffet-packages", h.create)
 	rg.PUT("/buffet-packages/:id", h.update)
 	rg.DELETE("/buffet-packages/:id", h.delete)
+	rg.GET("/buffet-packages/:id/menus", h.listMenus)
 }
 
 func (h *Handler) list(c *gin.Context) {
@@ -51,6 +52,21 @@ func (h *Handler) get(c *gin.Context) {
 	}
 
 	response.OK(c, pkg)
+}
+
+func (h *Handler) listMenus(c *gin.Context) {
+	id, ok := packageID(c)
+	if !ok {
+		return
+	}
+
+	menus, err := h.uc.ListMenus(c.Request.Context(), id)
+	if err != nil {
+		h.fail(c, "list buffet package menus", err)
+		return
+	}
+
+	response.OK(c, menus)
 }
 
 func (h *Handler) create(c *gin.Context) {

@@ -19,6 +19,7 @@ import (
 )
 
 type fakeRepo struct {
+	menus []IncludedMenu
 	pkgs  []Package
 	saved []PackageInput
 	err   error
@@ -55,6 +56,16 @@ func (f *fakeRepo) Update(_ context.Context, id uuid.UUID, in PackageInput) (Pac
 
 func (f *fakeRepo) Delete(_ context.Context, _ uuid.UUID) error {
 	return f.err
+}
+
+func (f *fakeRepo) ListMenusUpToLevel(_ context.Context, level int) ([]IncludedMenu, error) {
+	var out []IncludedMenu
+	for _, m := range f.menus {
+		if m.MinPackageLevel <= level {
+			out = append(out, m)
+		}
+	}
+	return out, f.err
 }
 
 func newTestRouter(repo *fakeRepo) *gin.Engine {
@@ -214,6 +225,34 @@ func TestGetHandler_UnknownID_Returns404(t *testing.T) {
 
 func TestGetHandler_InvalidID_Returns404(t *testing.T) {
 	w := get(newTestRouter(&fakeRepo{}), "/api/v1/buffet-packages/not-a-uuid")
+
+	assert.Equal(t, http.StatusNotFound, w.Code)
+	assert.Equal(t, "NOT_FOUND", errorCode(t, w))
+}
+
+func TestListMenusHandler_ReturnsMenusUpToPackageLevel(t *testing.T) {
+	pkg := samplePackage() // level 1
+	repo := &fakeRepo{
+		pkgs: []Package{pkg},
+		menus: []IncludedMenu{
+			{ID: uuid.New(), Name: "หมูสามชั้น", MinPackageLevel: 1},
+			{ID: uuid.New(), Name: "เนื้อวากิว", MinPackageLevel: 2},
+		},
+	}
+
+	w := get(newTestRouter(repo), "/api/v1/buffet-packages/"+pkg.ID.String()+"/menus")
+
+	assert.Equal(t, http.StatusOK, w.Code)
+	var body struct {
+		Data []IncludedMenu `json:"data"`
+	}
+	require.NoError(t, json.Unmarshal(w.Body.Bytes(), &body))
+	require.Len(t, body.Data, 1, "a level 1 package must not include a level 2 menu")
+	assert.Equal(t, "หมูสามชั้น", body.Data[0].Name)
+}
+
+func TestListMenusHandler_UnknownPackage_Returns404(t *testing.T) {
+	w := get(newTestRouter(&fakeRepo{}), "/api/v1/buffet-packages/"+uuid.NewString()+"/menus")
 
 	assert.Equal(t, http.StatusNotFound, w.Code)
 	assert.Equal(t, "NOT_FOUND", errorCode(t, w))

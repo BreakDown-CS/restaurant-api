@@ -18,6 +18,7 @@ type repository interface {
 	Create(ctx context.Context, in PackageInput) (Package, error)
 	Update(ctx context.Context, id uuid.UUID, in PackageInput) (Package, error)
 	Delete(ctx context.Context, id uuid.UUID) error
+	ListMenusUpToLevel(ctx context.Context, level int) ([]IncludedMenu, error)
 }
 
 type Usecase struct {
@@ -34,6 +35,15 @@ func (u *Usecase) List(ctx context.Context) ([]Package, error) {
 
 func (u *Usecase) Get(ctx context.Context, id uuid.UUID) (Package, error) {
 	return u.repo.GetByID(ctx, id)
+}
+
+func (u *Usecase) ListMenus(ctx context.Context, id uuid.UUID) ([]IncludedMenu, error) {
+	pkg, err := u.repo.GetByID(ctx, id)
+	if err != nil {
+		return nil, err
+	}
+
+	return u.repo.ListMenusUpToLevel(ctx, pkg.Level)
 }
 
 func (u *Usecase) Create(ctx context.Context, in PackageInput) (Package, error) {
