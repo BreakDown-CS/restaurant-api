@@ -126,3 +126,20 @@ func (r *Repository) Delete(ctx context.Context, id uuid.UUID) error {
 
 	return nil
 }
+
+func (r *Repository) ListMenusUpToLevel(ctx context.Context, level int) ([]IncludedMenu, error) {
+	rows, err := r.db.Query(ctx, `
+		SELECT m.id, m.name, c.name AS category, m.is_available, m.min_package_level
+		FROM menus m
+		JOIN categories c ON c.id = m.category_id
+		WHERE m.min_package_level <= $1
+		ORDER BY m.min_package_level ASC, c.name, m.name ASC`,
+		level,
+	)
+
+	if err != nil {
+		return nil, err
+	}
+
+	return pgx.CollectRows(rows, pgx.RowToStructByName[IncludedMenu])
+}

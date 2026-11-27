@@ -127,3 +127,42 @@ func TestNotFound(t *testing.T) {
 	require.ErrorIs(t, err, ErrNotFound)
 	require.ErrorIs(t, repo.Delete(ctx, missing), ErrNotFound)
 }
+
+func TestListMenusUpToLevel(t *testing.T) {
+	pool := testPool(t)
+	ctx := context.Background()
+
+	var categoryID uuid.UUID
+	require.NoError(t, pool.QueryRow(ctx,
+		`INSERT INTO categories (name) VALUES ('Test Level Cat') RETURNING id`).Scan(&categoryID))
+	t.Cleanup(func() {
+		_, _ = pool.Exec(ctx, `DELETE FROM menus WHERE category_id = $1`, categoryID)
+		_, _ = pool.Exec(ctx, `DELETE FROM categories WHERE id = $1`, categoryID)
+	})
+	_, err := pool.Exec(ctx, `
+		INSERT INTO menus (name, price, category_id, min_package_level) VALUES
+			('Test Pork', 0, $1, 1),
+			('Test Wagyu', 0, $1, 2),
+			('Test Beer', 80, $1, NULL)`, categoryID)
+	require.NoError(t, err)
+
+	repo := NewRepository(pool)
+
+	require.Equal(t, []string{"Test Pork"}, testMenuNames(t, repo, 1))
+	require.Equal(t, []string{"Test Pork", "Test Wagyu"}, testMenuNames(t, repo, 2))
+}
+
+// testMenuNames lists the menus for level and keeps only the ones this test made.
+func testMenuNames(t *testing.T, repo *Repository, level int) []string {
+	t.Helper()
+	menus, err := repo.ListMenusUpToLevel(context.Background(), level)
+	require.NoError(t, err)
+
+	var names []string
+	for _, m := range menus {
+		if m.Category == "Test Level Cat" {
+			names = append(names, m.Name)
+		}
+	}
+	return names
+}

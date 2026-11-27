@@ -26,6 +26,14 @@ type Package struct {
 	UpdatedAt            time.Time       `json:"updatedAt"`
 }
 
+type IncludedMenu struct {
+	ID              uuid.UUID `json:"id"`
+	Name            string    `json:"name"`
+	Category        string    `json:"category"`
+	IsAvailable     bool      `json:"isAvailable"`
+	MinPackageLevel int       `json:"minPackageLevel"`
+}
+
 var (
 	ErrNotFound  = errors.New("buffet package not found")
 	ErrNameTaken = errors.New("buffet package name already taken")
